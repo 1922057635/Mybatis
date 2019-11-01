@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.PersonDao">
+	<resultMap type="Person" id="PersonIdResult">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="age" column="age"/>
+		<result property="sex" column="sex"/>
+		<association property="card" column="card_id" javaType="card" select="com.dao.CardDao.getCardById"></association>
+	</resultMap>
+	<resultMap type="Person" id="PersonsIdResult">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="age" column="age"/>
+		<result property="sex" column="sex"/>
+		<association property="card" javaType="card">
+			<id property="id" column="card_id"/>
+			<result property="code" column="code"/>
+		</association>
+	</resultMap>
+	<resultMap type="Users" id="PersonAndCardByCardIdResult">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="age" column="age"/>
+		<result property="sex" column="sex"/>
+		<collection property="list" ofType="card">
+			<id property="id" column="card_id"/>
+			<result property="code" column="code"/>
+		</collection>
+	</resultMap>
+	<select id="findPersonById" parameterType="Integer" resultMap="PersonIdResult">
+	select * from person where id=#{id}
+	</select>
+	<select id="findPersonsById" parameterType="List" resultMap="PersonsIdResult">
+		select person.*,card.code
+		from person,card
+		where person.card_id=card.id and person.id in 
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+		#{id}
+	</foreach>
+	</select>
+	<select id="selectPersonAndCardByCardId" parameterType="Integer" resultMap="PersonAndCardByCardIdResult">
+		select person.*,card.code from person,card where person.card_id=card.id and person.card_id=#{id};
+	</select>
+</mapper>
